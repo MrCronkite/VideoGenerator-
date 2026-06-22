@@ -148,6 +148,14 @@ final class TemplatesViewController: BaseController, TemplatesViewProtocol {
         showLoadingIndicator()
     }
 
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if isMovingFromParent || isBeingDismissed {
+            VideoPlayerPool.shared.clearAll()
+        }
+    }
+
     func showTemplates(_ templates: [Template]) {
         hideLoadingIndicator()
 

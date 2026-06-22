@@ -129,6 +129,14 @@ final class VideoResultViewController: BaseController, VideoResultViewProtocol {
         )
     }
 
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if isMovingFromParent || isBeingDismissed {
+            VideoPlayerPool.shared.clearAll()
+        }
+    }
+
     func loadVideo(url: URL) {
         hideGenerating()
         let player = VideoPlayerPool.shared.player(for: url)

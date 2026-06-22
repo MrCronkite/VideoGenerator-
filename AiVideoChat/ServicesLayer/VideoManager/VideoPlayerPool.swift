@@ -25,9 +25,8 @@ final class VideoPlayerPool {
         evictIfNeeded()
 
         let item = VideoCacheManager.shared.playerItem(for: url)
-        item.preferredForwardBufferDuration = 2
-
         let player = AVPlayer(playerItem: item)
+
         player.isMuted = true
         player.actionAtItemEnd = .none
         player.automaticallyWaitsToMinimizeStalling = false
@@ -45,11 +44,6 @@ final class VideoPlayerPool {
         accessOrder.append(url)
 
         return player
-    }
-
-    func prefetch(url: URL) {
-        guard players[url] == nil else { return }
-        _ = player(for: url)
     }
 
     private func touch(_ url: URL) {
@@ -71,6 +65,10 @@ final class VideoPlayerPool {
         }
         players.removeValue(forKey: url)
         accessOrder.removeAll { $0 == url }
+    }
+
+    func clearAll() {
+        accessOrder.forEach { removePlayer(for: $0) }
     }
 }
 

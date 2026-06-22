@@ -190,6 +190,14 @@ final class EditorViewController: BaseController, EditorViewProtocol {
             cornerRadius: 16
         ).cgPath
     }
+
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+
+        if isMovingFromParent || isBeingDismissed {
+            VideoPlayerPool.shared.clearAll()
+        }
+    }
 }
 
 extension EditorViewController {
