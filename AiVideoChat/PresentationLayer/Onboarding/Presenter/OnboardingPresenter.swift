@@ -25,6 +25,7 @@ final class OnboardingPresenterImpl: OnboardingPresenter {
 
 
     func showPaywall() {
+        router.hasSeenOnboarding = true 
         router.showPaywall()
     }
 }

@@ -14,6 +14,7 @@ protocol RouterProtocol: AnyObject {
 }
 
 protocol AppRouterProtocol: RouterProtocol {
+    var hasSeenOnboarding: Bool { get set }
     var onChatSelected: ((String) -> Void)? { get set }
 
     func showPaywall()
@@ -36,6 +37,12 @@ final class AppRouter: AppRouterProtocol {
     weak var navigationController: UINavigationController?
     private let builder: BuilderProtocol
 
+    @UserDefault(
+        key: AppStorageKeys.hasSeenOnboarding,
+        defaultValue: false
+    )
+    var hasSeenOnboarding: Bool
+
     var onChatSelected: ((String) -> Void)?
 
     init(builder: BuilderProtocol = ModuleBuilder()) {
@@ -43,15 +50,17 @@ final class AppRouter: AppRouterProtocol {
     }
 
     func initialViewController() {
-        let onboardingVC = builder.buildOnboardingModule(router: self)
-        onboardingVC.modalPresentationStyle = .fullScreen
-        navigationController?.viewControllers = [onboardingVC]
+        if !hasSeenOnboarding {
+            showOnboarding()
+        } else {
+            showMain()
+        }
     }
 
     func showOnboarding() {
         let onboardingVC = builder.buildOnboardingModule(router: self)
         onboardingVC.modalPresentationStyle = .fullScreen
-        navigationController?.present(onboardingVC, animated: true)
+        navigationController?.viewControllers = [onboardingVC]
     }
 
     func showPaywall() {

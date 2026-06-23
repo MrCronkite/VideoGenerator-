@@ -11,8 +11,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
 
-    private let pm = PurchaseManager()
-
     func scene(
         _ scene: UIScene,
         willConnectTo session: UISceneSession,
@@ -24,9 +22,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         navigationController.navigationBar.isHidden = true
         let router = AppRouter()
         router.navigationController = navigationController
-        pm.isPremium
-        ? router.showMain()
-        : router.initialViewController()
+        router.initialViewController()
 
         window = UIWindow(windowScene: windowScene)
         window?.rootViewController = navigationController
