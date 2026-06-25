@@ -55,7 +55,6 @@ final class EditorViewController: BaseController, EditorViewProtocol {
     private let imageContainerView: UIView = {
         let view = UIView()
         view.layer.cornerRadius = 16
-       // view.clipsToBounds = true
         return view
     }()
 
@@ -191,11 +190,38 @@ final class EditorViewController: BaseController, EditorViewProtocol {
         ).cgPath
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        for cell in collectionView
+            .visibleCells
+            .compactMap({ $0 as? PreviewCell })
+        {
+            cell.resumePlaybackIfNeeded()
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        for cell in collectionView
+            .visibleCells
+            .compactMap({ $0 as? PreviewCell })
+        {
+            cell.pausePlayback()
+        }
+    }
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
         if isMovingFromParent || isBeingDismissed {
-            VideoPlayerPool.shared.clearAll()
+            for cell in collectionView
+                .visibleCells
+                .compactMap({ $0 as? PreviewCell })
+            {
+                cell.cancelPlayback()
+            }
         }
     }
 }

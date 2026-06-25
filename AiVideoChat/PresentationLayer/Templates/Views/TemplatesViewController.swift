@@ -148,11 +148,38 @@ final class TemplatesViewController: BaseController, TemplatesViewProtocol {
         showLoadingIndicator()
     }
 
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
+        for cell in templatesCollectionView
+            .visibleCells
+            .compactMap({ $0 as? TemplateCell })
+        {
+            cell.resumePlaybackIfNeeded()
+        }
+    }
+
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+
+        for cell in templatesCollectionView
+            .visibleCells
+            .compactMap({ $0 as? TemplateCell })
+        {
+            cell.pausePlayback()
+        }
+    }
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
 
         if isMovingFromParent || isBeingDismissed {
-            VideoPlayerPool.shared.clearAll()
+            for cell in templatesCollectionView
+                .visibleCells
+                .compactMap({ $0 as? TemplateCell })
+            {
+                cell.cancelPlayback()
+            }
         }
     }
 

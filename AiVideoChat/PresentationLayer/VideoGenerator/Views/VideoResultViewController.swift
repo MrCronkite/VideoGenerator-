@@ -133,13 +133,16 @@ final class VideoResultViewController: BaseController, VideoResultViewProtocol {
         super.viewDidDisappear(animated)
 
         if isMovingFromParent || isBeingDismissed {
-            VideoPlayerPool.shared.clearAll()
+
         }
     }
 
     func loadVideo(url: URL) {
         hideGenerating()
-        let player = VideoPlayerPool.shared.player(for: url)
+        let player = AVPlayer(url: url)
+        player.isMuted = true
+        player.actionAtItemEnd = .none
+        player.automaticallyWaitsToMinimizeStalling = false
         playerLayer.player = player
         player.play()
     }

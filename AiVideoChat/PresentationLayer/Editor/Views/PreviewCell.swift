@@ -14,6 +14,8 @@ final class PreviewCell: UICollectionViewCell {
 
     private let playerLayer = AVPlayerLayer()
     private var currentURL: URL?
+    private var playbackTask: Task<Void, Never>?
+    private var player: AVPlayer?
 
     // MARK: — Loading indicator
 
@@ -44,10 +46,7 @@ final class PreviewCell: UICollectionViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
 
-        statusObserver?.invalidate()
-        statusObserver = nil
-
-        playerLayer.player = nil
+        cancelPlayback()
         currentURL = nil
 
         loadingIndicator.stopAnimating()
@@ -56,22 +55,35 @@ final class PreviewCell: UICollectionViewCell {
     func configure(with template: Template) {
 
         guard let url = URL(string: template.previewSmall) else { return }
+
         if currentURL == url { return }
+
+        cancelPlayback()
         currentURL = url
 
-        loadingIndicator.startAnimating()
+        playbackTask = Task(priority: .utility) { [weak self] in
+            guard let self, self.currentURL == url else { return }
 
-        let player = VideoPlayerPool.shared.player(for: url)
-        playerLayer.player = player
+            let item = await VideoCacheManager.shared.playerItem(for: url)
 
-        statusObserver = player.currentItem?.observe(\.status, options: [.new]) { [weak self] item, _ in
-            guard item.status == .readyToPlay else { return }
-            DispatchQueue.main.async {
-                self?.loadingIndicator.stopAnimating()
+            guard self.currentURL == url else {
+                await VideoCacheManager.shared.releaseInterest(for: url)
+                return
+            }
+
+            await MainActor.run {
+                guard self.currentURL == url else { return }
+
+                let player = AVPlayer(playerItem: item)
+                player.isMuted = true
+                player.actionAtItemEnd = .none
+                player.automaticallyWaitsToMinimizeStalling = false
+
+                self.player = player
+                self.playerLayer.player = player
+                player.play()
             }
         }
-
-        player.play()
     }
 
     func setupUI() {
@@ -90,7 +102,26 @@ final class PreviewCell: UICollectionViewCell {
         ])
     }
 
-    deinit {
-        statusObserver?.invalidate()
+    func cancelPlayback() {
+        playbackTask?.cancel()
+        playbackTask = nil
+
+        if let url = currentURL {
+            Task { await VideoCacheManager.shared.releaseInterest(for: url) }
+        }
+
+        player?.pause()
+        playerLayer.player = nil
+        player?.replaceCurrentItem(with: nil)
+        player = nil
+    }
+
+    func pausePlayback() {
+        player?.pause()
+    }
+
+    func resumePlaybackIfNeeded() {
+        guard currentURL != nil else { return }
+        player?.play()
     }
 }
