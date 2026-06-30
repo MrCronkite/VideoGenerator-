@@ -385,3 +385,26 @@ extension TemplatesViewController: UICollectionViewDelegateFlowLayout {
         )
     }
 }
+
+extension TemplatesViewController {
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        willDisplay cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
+        guard collectionView == templatesCollectionView,
+              let cell = cell as? TemplateCell else { return }
+        cell.resumePlaybackIfNeeded()
+    }
+
+    func collectionView(
+        _ collectionView: UICollectionView,
+        didEndDisplaying cell: UICollectionViewCell,
+        forItemAt indexPath: IndexPath
+    ) {
+        guard collectionView == templatesCollectionView,
+              let cell = cell as? TemplateCell else { return }
+        cell.pausePlayback()
+    }
+}
