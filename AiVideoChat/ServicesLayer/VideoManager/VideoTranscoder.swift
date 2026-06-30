@@ -35,7 +35,7 @@ enum VideoTranscoder {
     static func downscale(
         sourceURL: URL,
         outputURL: URL,
-        maxDimension: CGFloat = 480,
+        maxDimension: CGFloat = 230,
         targetFPS: Int32 = 24
     ) async throws {
 

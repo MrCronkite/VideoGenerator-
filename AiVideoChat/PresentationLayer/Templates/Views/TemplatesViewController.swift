@@ -118,7 +118,7 @@ final class TemplatesViewController: BaseController, TemplatesViewProtocol {
                     widthDimension: .fractionalWidth(1),
                     heightDimension: .absolute(220)
                 ),
-                subitems: [item]
+                subitems: [item, item]
             )
 
             return NSCollectionLayoutSection(group: group)
@@ -286,28 +286,16 @@ extension TemplatesViewController: UICollectionViewDataSource {
     func numberOfSections(
         in collectionView: UICollectionView
     ) -> Int {
-
-        if collectionView == templatesCollectionView {
-            return 2
-        }
-
-        return 1
+        1
     }
 
     func collectionView(
         _ collectionView: UICollectionView,
         numberOfItemsInSection section: Int
     ) -> Int {
-
-        if collectionView == categoriesCollectionView {
-            return categories.count
-        }
-
-        let half = filteredTemplates.count / 2
-
-        return section == 0
-        ? half
-        : filteredTemplates.count - half
+        collectionView == categoriesCollectionView
+        ? categories.count
+        : filteredTemplates.count
     }
 
     func collectionView(
@@ -337,11 +325,7 @@ extension TemplatesViewController: UICollectionViewDataSource {
             for: indexPath
         ) as! TemplateCell
 
-        let half = filteredTemplates.count / 2
-
-        let template = indexPath.section == 0
-        ? filteredTemplates[indexPath.item]
-        : filteredTemplates[half + indexPath.item]
+        let template = filteredTemplates[indexPath.item]
 
         cell.configure(with: template)
 
@@ -352,19 +336,23 @@ extension TemplatesViewController: UICollectionViewDataSource {
 extension TemplatesViewController: UICollectionViewDelegate {
 
     func collectionView(
-        _ collectionView: UICollectionView,
-        didSelectItemAt indexPath: IndexPath
-    ) {
+            _ collectionView: UICollectionView,
+            didSelectItemAt indexPath: IndexPath
+        ) {
 
-        if collectionView == categoriesCollectionView {
-            selectedCategory = categories[indexPath.item]
+            if collectionView == categoriesCollectionView {
+                selectedCategory = categories[indexPath.item]
 
-            categoriesCollectionView.reloadData()
-            templatesCollectionView.reloadData()
-        } else {
-            presenter.openEditor(with: filteredTemplates)
+                categoriesCollectionView.reloadData()
+                templatesCollectionView.reloadData()
+            } else {
+                let template = filteredTemplates[indexPath.item]
+                presenter.openEditor(
+                    with: filteredTemplates,
+                    selected: template
+                )
+            }
         }
-    }
 }
 
 extension TemplatesViewController: UICollectionViewDelegateFlowLayout {

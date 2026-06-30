@@ -9,7 +9,7 @@ import UIKit
 
 protocol TemplatesPresenter: AnyObject {
     func loadTemplates()
-    func openEditor(with template: [Template])
+    func openEditor(with template: [Template], selected: Template)
     func goToBack()
 }
 
@@ -45,7 +45,7 @@ final class TemplatesPresenterImpl: TemplatesPresenter {
         router.pop()
     }
 
-    func openEditor(with templates: [Template]) {
+    func openEditor(with templates: [Template], selected: Template) {
         router.showEditor(templates)
     }
 }
