@@ -161,7 +161,7 @@ final class MainViewController: BaseController, MainViewProtocol {
         let stack = UIStackView()
         stack.axis = .horizontal
         stack.alignment = .fill
-        stack.distribution = .fill
+        stack.distribution = .fillEqually
         stack.spacing = 8
         return stack
     }()
@@ -261,8 +261,6 @@ extension MainViewController {
             cardsRowStack.topAnchor.constraint(equalTo: askedView.bottomAnchor, constant: 40),
             cardsRowStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
             cardsRowStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
-
-            intoVideoView.widthAnchor.constraint(equalTo: rightColumnStack.widthAnchor, multiplier: 0.9),
 
             intoImageView.leadingAnchor.constraint(equalTo: intoVideoView.leadingAnchor),
             intoImageView.topAnchor.constraint(equalTo: intoVideoView.topAnchor),
